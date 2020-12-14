@@ -1,0 +1,9 @@
+// Commentaire sur 1 ligne
+/* Commentaire sur
+   plusieurs lignes
+ */
+
+a = 10;
+b = 8;
+print_num(a == b);
+print_nl();

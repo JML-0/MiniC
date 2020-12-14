@@ -1,0 +1,29 @@
+print_str("salut !");
+print_nl();
+print_num(1 + 2 + 3 + 4 + 5);
+print_nl();
+
+# struct pair { int head; struct pair *tail; };
+# 
+# struct pair *pair (int head, struct pair *tail)
+# {
+#   struct pair *p = malloc(sizeof(struct pair));
+#   p->head = head; // (*p).head
+#   p->tail = tail;
+#   return p;
+# }
+# int head (struct pair *p) { return p->head; }
+# struct pair *tail (struct pair *p) { return p->tail; }
+
+# print_num(head(pair(42, pair(13, pair(51, nil())))));
+
+toto = head(pair(42, nil()));
+
+print_num(toto);
+
+# print_nl();
+
+# FP : pour avoir des adresses fixes pour les arguments
+# discipline SP
+# push RA et FP en début de fonctions
+# pop RA et FP en fin de fonctions
