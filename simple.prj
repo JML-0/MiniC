@@ -3,7 +3,7 @@
    plusieurs lignes
  */
 
-a = 10;
+a = 20;
 b = 8;
-print_num(a == b);
+print_num(a >= b); // pour afficher la valeur bool, mettre le résultat dans le registre $v0
 print_nl();

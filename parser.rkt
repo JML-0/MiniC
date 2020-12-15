@@ -31,12 +31,15 @@
      [(expr Ldiv expr)          (Pcall '%div (list $1 $3) $2-start-pos)]
      [(expr Lmod expr)          (Pcall '%mod (list $1 $3) $2-start-pos)]
      [(expr Lequal expr)        (Pcall '%seq (list $1 $3) $2-start-pos)]
-     [(expr Lnequal expr)       (Pcall '%!= (list $1 $3) $2-start-pos)]
-     [(expr Lpp expr)           (Pcall '%<  (list $1 $3) $2-start-pos)]
-     [(expr Lpg expr)           (Pcall '%>  (list $1 $3) $2-start-pos)]
-     [(expr Lppe expr)          (Pcall '%<= (list $1 $3) $2-start-pos)]
-     [(expr Lpge expr)          (Pcall '%>= (list $1 $3) $2-start-pos)]
+     [(expr Lnequal expr)       (Pcall '%sne (list $1 $3) $2-start-pos)]
+     [(expr Lpp expr)           (Pcall '%slt (list $1 $3) $2-start-pos)]
+     [(expr Lpg expr)           (Pcall '%sgt (list $1 $3) $2-start-pos)]
+     [(expr Lppe expr)          (Pcall '%sle (list $1 $3) $2-start-pos)]
+     [(expr Lpge expr)          (Pcall '%sge (list $1 $3) $2-start-pos)]
+     ;[(test)                    $1]
      [(Lident Lopar args Lcpar) (Pcall $1 $3 $1-start-pos)])
+    (test
+     [(Lif Lopar expr Lcpar expr Lelse expr) (Pcond $3 $5 $7 $1-start-pos)])
     (args
      [()                 (list)]
      [(expr)             (list $1)]

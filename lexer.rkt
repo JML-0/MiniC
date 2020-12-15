@@ -12,11 +12,12 @@
 
 (define-empty-tokens punctuations
   (Lsemicol
-  Lopar Lcpar
+  Lopar Lcpar Locbra Lccbra
   Lcomma))
 
 (define-empty-tokens keywords
-  (Leof))
+  (Lif Lelse
+  Leof))
 
 (define-tokens constants
   (Lident Lnum Lstr))
@@ -37,6 +38,8 @@
    ["/*"         (return-without-pos (long-comment-lex input-port))]
    ["("          (token-Lopar)]
    [")"          (token-Lcpar)]
+   ["{"          (token-Locbra)] ;;curly bra
+   ["}"          (token-Lccbra)]
    [","          (token-Lcomma)]
    [";"          (token-Lsemicol)]
    ["="          (token-Lassign)]
@@ -51,6 +54,8 @@
    ["*"          (token-Lmul)]
    ["/"          (token-Ldiv)]
    ["%"          (token-Lmod)]
+   ["if"         (token-Lif)]
+   ["else"       (token-Lelse)]
    [identifier   (token-Lident (string->symbol lexeme))]
    ["\""         (token-Lstr (string-lex input-port))]
    [(:+ numeric) (token-Lnum (string->number lexeme))]

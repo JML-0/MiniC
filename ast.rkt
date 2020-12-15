@@ -8,6 +8,8 @@
 (struct Pvar (name pos)        #:transparent)
 (struct Pcall (func args pos)  #:transparent)
 (struct Passign (var expr pos) #:transparent)
+(struct Pcond (val t f pos)    #:transparent)
+(struct Pblock (expr pos)      #:transparent)
 
 ;; abstract syntax
 (struct Num (val)              #:transparent)
@@ -15,6 +17,8 @@
 (struct Var (name)             #:transparent)
 (struct Call (func args)       #:transparent)
 (struct Assign (var expr)      #:transparent)
+(struct Cond (val t f)         #:transparent)
+(struct Block (block)          #:transparent)
 
 ;; inter lang
 (struct Data (lbl)             #:transparent)
@@ -37,6 +41,11 @@
 (struct Div     (dst rg1 rg2)  #:transparent)
 (struct Mod     (dst rg1 rg2)  #:transparent)
 (struct Seq     (dst rg1 rg2)  #:transparent)
+(struct Sne     (dst rg1 rg2)  #:transparent)
+(struct Slt     (dst rg1 rg2)  #:transparent)
+(struct Sgt     (dst rg1 rg2)  #:transparent)
+(struct Sle     (dst rg1 rg2)  #:transparent)
+(struct Sge     (dst rg1 rg2)  #:transparent)
 (struct Sw      (reg loc)      #:transparent)
 (struct Lw      (reg loc)      #:transparent)
 (struct Jr      (reg)          #:transparent)
