@@ -16,19 +16,26 @@
   Lcomma))
 
 (define-empty-tokens keywords
-  (Lif Lelse
+  (Lif Lthen Lelse
+  Lwhile
   Leof))
 
 (define-tokens constants
-  (Lident Lnum Lstr))
+  (Lident Lnum Lstr Lbool Ltype))
 
 (define-empty-tokens operators
-  (Lplus Lsub Lmul Ldiv Lmod
+  (Lplus Lpplus Lsub Lmul Ldiv Lmod
    Lequal Lnequal Lpp Lpg Lppe Lpge
    Lassign))
 
 (define-lex-abbrev identifier
   (:: alphabetic (:* (:or alphabetic numeric #\_))))
+
+(define-lex-abbrev bool
+  (:or "true" "false"))
+
+(define-lex-abbrev types
+  (:or "int" "str" "bool"))
 
 (define get-token
   (lexer-src-pos
@@ -50,15 +57,19 @@
    ["<="         (token-Lppe)]
    [">="         (token-Lpge)]
    ["+"          (token-Lplus)]
+   ["++"         (token-Lpplus)]
    ["-"          (token-Lsub)]
    ["*"          (token-Lmul)]
    ["/"          (token-Ldiv)]
    ["%"          (token-Lmod)]
    ["if"         (token-Lif)]
    ["else"       (token-Lelse)]
+   ["while"      (token-Lwhile)]
+   [types        (token-Ltype (string->symbol lexeme))]
    [identifier   (token-Lident (string->symbol lexeme))]
    ["\""         (token-Lstr (string-lex input-port))]
    [(:+ numeric) (token-Lnum (string->number lexeme))]
+   [bool         (token-Lbool (string=? "true" lexeme))]
    [any-char (err (format "unrecognized character '~a'" lexeme)
                   start-pos)]))
 

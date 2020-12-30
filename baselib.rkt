@@ -5,10 +5,6 @@
 
 (provide (all-defined-out))
 
-(struct Fun_t (ret args))
-(struct Ptr_t (t) #:transparent)
-(struct Struct_t (name fields))
-
 (define pair (Struct_t 'pair (list (cons 'head 'num)
                                    (cons 'tail (Ptr_t 'pair)))))
 
@@ -34,30 +30,35 @@
 
 (define *baselib-types*
   (make-immutable-hash
-   (list (cons '%add (Fun_t 'num (list 'num 'num)))
-         (cons '%sub (Fun_t 'num (list 'num 'num)))
-         (cons '%mul (Fun_t 'num (list 'num 'num)))
-         (cons '%div (Fun_t 'num (list 'num 'num)))
-         (cons '%mod (Fun_t 'num (list 'num 'num)))
-         (cons '%seq (Fun_t 'num (list 'num 'num))) ;; -> 'num pour tester
-         (cons '%sne (Fun_t 'num (list 'num 'num)))
-         (cons '%slt (Fun_t 'num (list 'num 'num)))
-         (cons '%sgt (Fun_t 'num (list 'num 'num)))
-         (cons '%sle (Fun_t 'num (list 'num 'num)))
-         (cons '%sge (Fun_t 'num (list 'num 'num))) ;;
-         (cons 'print_num (Fun_t 'void (list 'num)))
-         (cons 'print_str (Fun_t 'void (list 'str)))
-         (cons 'print_nl  (Fun_t 'void (list)))
-         (cons 'nil       (Fun_t (Ptr_t '%) (list)))
-         (cons 'pair      (Fun_t (Ptr_t 'pair) (list 'num (Ptr_t 'pair))))
-         (cons 'head      (Fun_t 'num (list (Ptr_t 'pair))))
-         (cons 'tail      (Fun_t (Ptr_t 'pair) (list (Ptr_t 'pair)))))))
+   (list (cons '%add (Fun_t 'num  (list 'num 'num)))
+         (cons '%addi (Fun_t 'num  (list 'num 'num)))
+         (cons '%sub (Fun_t 'num  (list 'num 'num)))
+         (cons '%mul (Fun_t 'num  (list 'num 'num)))
+         (cons '%div (Fun_t 'num  (list 'num 'num)))
+         (cons '%mod (Fun_t 'num  (list 'num 'num)))
+         (cons '%seq (Fun_t 'void (list 'num 'num))) ;; -> 'num pour tester
+         (cons '%sne (Fun_t 'void (list 'num 'num)))
+         (cons '%slt (Fun_t 'void (list 'num 'num)))
+         (cons '%sgt (Fun_t 'void (list 'num 'num)))
+         (cons '%sle (Fun_t 'void (list 'num 'num)))
+         (cons '%sge (Fun_t 'void (list 'num 'num))) ;;
+         (cons 'print_num  (Fun_t 'void (list 'num)))
+         (cons 'print_str  (Fun_t 'void (list 'str)))
+         (cons 'print_bool (Fun_t 'void (list 'bool)))
+         (cons 'print_nl   (Fun_t 'void (list)))
+         (cons 'nil        (Fun_t (Ptr_t '%) (list)))
+         (cons 'pair       (Fun_t (Ptr_t 'pair) (list 'num (Ptr_t 'pair))))
+         (cons 'head       (Fun_t 'num (list (Ptr_t 'pair))))
+         (cons 'tail       (Fun_t (Ptr_t 'pair) (list (Ptr_t 'pair)))))))
 
 (define *baselib-builtins*
   (make-immutable-hash
    (list (cons '%add (list (Lw 't0 (Mem 'sp 4))
                            (Lw 't1 (Mem 'sp 0))
                            (Add 'v0 't0 't1)))
+         (cons '%addi (list (Lw 't0 (Mem 'sp 4))
+                           (Lw 't1 (Mem 'sp 0))
+                           (Addi 'v0 'v0 1)))
          (cons '%sub (list (Lw 't0 (Mem 'sp 4))
                            (Lw 't1 (Mem 'sp 0))
                            (Sub 'v0 't0 't1)))
@@ -95,6 +96,9 @@
          (cons 'print_str (list (Lw 'a0 (Mem 'sp 0))
                                 (Li 'v0 PRINT_STRING)
                                 (Syscall)))
+         (cons 'print_bool (list (Lw 'a0 (Mem 'sp 0))
+                                 (Li 'v0 PRINT_INT)
+                                 (Syscall)))
          (cons 'print_nl (list (La 'a0 (Lbl 'nl))
                                (Li 'v0 PRINT_STRING)
                                (Syscall)))

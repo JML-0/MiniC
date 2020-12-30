@@ -16,34 +16,55 @@
    (end Leof)
    (grammar
     (prog
-     [(instr Lsemicol)      (list $1)]
-     [(instr Lsemicol prog) (cons $1 $3)])
+     [(instr)                     (list $1)]
+     [(instr prog)                (cons $1 $2)])
     (instr
-     [(Lident Lassign expr)      (Passign $1 $3 $1-start-pos)]
-     [(Lident Lopar args Lcpar) (Pcall $1 $3 $1-start-pos)])
+     [(type Lident Lassign sexpr Lsemicol) (Passign $2 $4 $1-start-pos)]
+     ;[(Lident Lopar args Lcpar)   (Pcall $1 $3 $1-start-pos)]
+     [(expr)                      $1])
     (expr
-     [(Lnum)                    (Pnum $1 $1-start-pos)]
-     [(Lstr)                    (Pstr $1 $1-start-pos)]
-     [(Lident)                  (Pvar $1 $1-start-pos)]
-     [(expr Lplus expr)         (Pcall '%add (list $1 $3) $2-start-pos)]
-     [(expr Lsub expr)          (Pcall '%sub (list $1 $3) $2-start-pos)]
-     [(expr Lmul expr)          (Pcall '%mul (list $1 $3) $2-start-pos)]
-     [(expr Ldiv expr)          (Pcall '%div (list $1 $3) $2-start-pos)]
-     [(expr Lmod expr)          (Pcall '%mod (list $1 $3) $2-start-pos)]
-     [(expr Lequal expr)        (Pcall '%seq (list $1 $3) $2-start-pos)]
-     [(expr Lnequal expr)       (Pcall '%sne (list $1 $3) $2-start-pos)]
-     [(expr Lpp expr)           (Pcall '%slt (list $1 $3) $2-start-pos)]
-     [(expr Lpg expr)           (Pcall '%sgt (list $1 $3) $2-start-pos)]
-     [(expr Lppe expr)          (Pcall '%sle (list $1 $3) $2-start-pos)]
-     [(expr Lpge expr)          (Pcall '%sge (list $1 $3) $2-start-pos)]
-     ;[(test)                    $1]
-     [(Lident Lopar args Lcpar) (Pcall $1 $3 $1-start-pos)])
-    (test
-     [(Lif Lopar expr Lcpar expr Lelse expr) (Pcond $3 $5 $7 $1-start-pos)])
+     ;[(instr)                     $1]
+     [(cond)                      $1]
+     [(loop)                      $1]
+     [(funcall)                   $1]
+     [(sexpr Lpplus Lsemicol)     (Pcall '%add (list $1 (Pnum 1 $1-start-pos)) $1-start-pos)]
+     [(Locbra exprs Lccbra)       (Pblock $2 $1-start-pos)])
+    (sexpr
+     [(funcall)                   $1]
+     [(constant)                  $1]
+     [(operator)                  $1]
+     [(Lopar sexpr Lcpar)         $2])
+    (exprs
+     [(expr exprs)                (cons $1 $2)]
+     [(expr)                      (list $1)])
+    (funcall
+     [(Lident Lopar args Lcpar Lsemicol)   (Pcall $1 $3 $1-start-pos)])
+    (cond
+     [(Lif Lopar sexpr Lcpar expr Lelse expr) (Pcond $3 $5 $7 $1-start-pos)])
+    (loop
+     [(Lwhile Lopar sexpr Lcpar expr) (Ploop $3 $5 $1-start-pos)])
+    (constant
+     [(Lnum)                      (Pnum $1 $1-start-pos)]
+     [(Lstr)                      (Pstr $1 $1-start-pos)]
+     [(Lident)                    (Pvar $1 $1-start-pos)])
+    (type
+     [(Ltype)      $1]) ;;Llist
+    (operator
+     [(sexpr Lplus sexpr)         (Pcall '%add (list $1 $3) $2-start-pos)]
+     [(sexpr Lsub sexpr)          (Pcall '%sub (list $1 $3) $2-start-pos)]
+     [(sexpr Lmul sexpr)          (Pcall '%mul (list $1 $3) $2-start-pos)]
+     [(sexpr Ldiv sexpr)          (Pcall '%div (list $1 $3) $2-start-pos)]
+     [(sexpr Lmod sexpr)          (Pcall '%mod (list $1 $3) $2-start-pos)]
+     [(sexpr Lequal sexpr)        (Pcall '%seq (list $1 $3) $2-start-pos)]
+     [(sexpr Lnequal sexpr)       (Pcall '%sne (list $1 $3) $2-start-pos)]
+     [(sexpr Lpp sexpr)           (Pcall '%slt (list $1 $3) $2-start-pos)]
+     [(sexpr Lpg sexpr)           (Pcall '%sgt (list $1 $3) $2-start-pos)]
+     [(sexpr Lppe sexpr)          (Pcall '%sle (list $1 $3) $2-start-pos)]
+     [(sexpr Lpge sexpr)          (Pcall '%sge (list $1 $3) $2-start-pos)])
     (args
-     [()                 (list)]
-     [(expr)             (list $1)]
-     ((expr Lcomma args) (cons $1 $3))))
+     [()                          (list)]
+     [(sexpr)                     (list $1)]
+     ((sexpr Lcomma args)         (cons $1 $3))))
    (precs 
     (left Lequal)
     (left Lnequal)

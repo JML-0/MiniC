@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/match
+         racket/list
          "ast.rkt"
          "baselib.rkt"
          "helper.rkt")
@@ -16,9 +17,19 @@
           (list (Addi 'sp 'sp -4)
                 (Sw 'v0 (Mem 'sp 0)))))
 
+(define counterCond 0)
+(define counterLoop 0)
+
+(define-syntax increment
+  (syntax-rules ()
+    ((_ x)   (begin (set! x (+ x 1)) x))
+    ((_ x n) (begin (set! x (+ x n)) x))))
+
 (define (compile-expr expr env)
   (match expr
     [(Num v)
+     (list (Li 'v0 v))]
+    [(Str v)
      (list (Li 'v0 v))]
     [(Data l)
      (list (La 'v0 (Lbl l)))]
@@ -28,9 +39,11 @@
      (append
       (apply append (map (lambda (e) (compile-expr-and-push e env)) as))
       (hash-ref env f)
-      (list (Addi 'sp 'sp (* 4 (length as)))))]))
+      (list (Addi 'sp 'sp (* 4 (length as)))))]
+    
+      ))
 
-(struct Cinstr (code env fp-sp))
+(struct Cinstr (code env fp-sp) #:transparent)
 
 (define (compile-instr instr env fp-sp)
   (match instr
@@ -41,7 +54,45 @@
     [(Call _ _)
      (Cinstr (compile-expr instr env)
              env
-             fp-sp)]))
+             fp-sp)]
+    [(Cond test yes no)
+     (increment counterCond)
+     (define ctest (compile-instr test env fp-sp))
+     (define cyes (compile-instr yes env (- fp-sp 4)))
+     (define cno (compile-instr no env (- fp-sp 8)))
+     (Cinstr
+      (append
+       (Cinstr-code ctest)
+       (list (Bnez 't9 (string-append "then_" (number->string counterCond)))
+             (Beqz 't9 (string-append "else_" (number->string counterCond))))
+       (list (Label (string-append "then_" (number->string counterCond))))
+       (Cinstr-code cyes)
+       (list (B (string-append "endif_" (number->string counterCond))))
+       (list (Label (string-append "else_" (number->string counterCond))))
+       (Cinstr-code cno)
+       (list (Label (string-append "endif_" (number->string counterCond)))))
+      env fp-sp)]
+    [(Block body)
+     (foldl (lambda (expr acc)
+              (let ((ce (compile-instr expr (Cinstr-env acc) fp-sp)))
+                (Cinstr (append (Cinstr-code acc)
+                              (Cinstr-code ce))
+                       (Cinstr-env ce) fp-sp)))
+            (Cinstr '() env fp-sp)
+            body)]
+    [(Loop test args)
+     (increment counterLoop)
+     (define ctest (compile-instr test env fp-sp))
+     (define cargs (compile-instr args env (- fp-sp 4)))
+     (Cinstr
+      (append
+       (Cinstr-code ctest)
+       (list (Label (string-append "loop_" (number->string counterLoop)))
+             (Beqz 't9 (string-append "endloop_" (number->string counterLoop))))
+       (Cinstr-code cargs)
+       (list (B (string-append "loop_" (number->string counterLoop))))
+       (list (Label (string-append "endloop_" (number->string counterLoop)))))
+      env fp-sp)]))
 
 (define (compile-prog prog env fp-sp)
   (match prog

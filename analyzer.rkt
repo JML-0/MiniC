@@ -20,17 +20,18 @@
     [(Pnum _ p) p]
     [(Pstr _ p) p]
     [(Pvar _ p) p]
-    [(Pcall _ _ p) p]))
+    [(Pcall _ _ p) p]
+    [(Pcond _ _ _ p) p]))
 
 (define (analyze-function f as pos env proc?)
   (unless (hash-has-key? env f)
     (err (format "unknown function '~a'" f) pos))
   (let ([ft (hash-ref env f)])
-    (if proc?
-        (unless (eq? 'void (Fun_t-ret ft))
-          (err (format "functions must return void if used as instruction: '~a'" f) pos))
-        (when (eq? 'void (Fun_t-ret ft))
-          (err (format "void is not a valid expression type: '~a'" f) pos)))
+    ;(if proc?
+    ;    (unless (eq? 'void (Fun_t-ret ft))
+    ;      (err (format "functions must return void if used as instruction: '~a'" f) pos))
+    ;    (when (eq? 'void (Fun_t-ret ft))
+    ;      (err (format "void is not a valid expression type: '~a'" f) pos)))
     (unless (= (length (Fun_t-args ft)) (length as))
       (err (format "arity mismatch (expected ~a, given ~a)"
                    (length (Fun_t-args ft))
@@ -60,7 +61,23 @@
      (cons (Var n)
            (hash-ref env n))]
     [(Pcall f as pos)
-     (analyze-function f as pos env #f)]))
+     (analyze-function f as pos env #f)]
+    ))
+
+(define (analyze-instrs exprs env) ;; { Instrs }
+  (let* ((rev (reverse exprs))
+         (last-expr (car rev))
+         (exprs (reverse (cdr rev)))
+         (ce (foldl
+              (lambda (expr acc)
+                (let ((ce (analyze-instr expr (cdr acc))))
+                  (cons (append (car acc) (list (car ce)))
+                        (cdr ce))))
+              (cons '() env)
+              exprs))
+         (l (analyze-instr last-expr (cdr ce))))
+      (cons (append (car ce) (list (car l)))
+            (cdr l))))
 
 (define (analyze-instr instr env)
   (match instr
@@ -70,6 +87,20 @@
              (hash-set env v (cdr ae))))]
     [(Pcall f as pos)
      (cons (car (analyze-function f as pos env #t))
+           env)]
+    [(Pcond test true false pos)
+     (let ((t (analyze-instr test env))
+           (y (analyze-instr true env))
+           (n (analyze-instr false env)))
+     (cons (Cond (car t) (car y) (car n))
+             env))]
+    [(Ploop test args pos)
+     (let ((t  (analyze-instr test env))
+           (a  (analyze-instr args env)))
+       (cons (Loop (car t) (car a))
+             env))]
+    [(Pblock exprs pos)
+     (cons (Block (car (analyze-instrs exprs env)))
            env)]))
 
 (define (analyze-prog prog env)

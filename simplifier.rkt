@@ -20,6 +20,12 @@
       [(Var n)
        (cons expr
              '())]
+      [(Cond v t f)
+       (cons expr
+             '())]
+      [(Loop v a)
+       (cons expr
+             '())]
       [(Call f as)
        (let ([sas (map scs-expr as)])
          (cons (Call f (map car sas))
@@ -31,6 +37,10 @@
          (cons (Assign v (car se))
                (cdr se)))]
       [(Call _ _)
+       (scs-expr instr)]
+      [(Cond _ _ _)
+       (scs-expr instr)]
+      [(Loop _ _)
        (scs-expr instr)]))
   (define (scs-prog prog)
     (match prog

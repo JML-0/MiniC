@@ -3,7 +3,12 @@
    plusieurs lignes
  */
 
-a = 20;
-b = 8;
-print_num(a >= b); // pour afficher la valeur bool, mettre le résultat dans le registre $v0
-print_nl();
+int a = 10;
+int b = 10;
+while (a == 10)
+{
+  print_num(a);
+  print_nl();
+}
+//print_bool((a + b) == 16); // pour afficher la valeur bool, mettre le résultat dans le registre $v0
+//print_nl();
