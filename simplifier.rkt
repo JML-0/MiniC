@@ -17,13 +17,16 @@
          (set! counter (add1 counter))
          (cons (Data lbl)
                (list (cons lbl v))))]
+      [(Bool v)
+       (cons expr
+             '())]
       [(Var n)
        (cons expr
              '())]
       [(Cond v t f)
        (cons expr
              '())]
-      [(Loop v a)
+      [(While v a)
        (cons expr
              '())]
       [(Call f as)
@@ -40,7 +43,7 @@
        (scs-expr instr)]
       [(Cond _ _ _)
        (scs-expr instr)]
-      [(Loop _ _)
+      [(While _ _)
        (scs-expr instr)]))
   (define (scs-prog prog)
     (match prog

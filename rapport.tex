@@ -1,0 +1,130 @@
+\documentclass[a4paper,10pt]{article} 
+
+% permet de définir des commentaires
+\usepackage[utf8]{inputenc}  
+\usepackage{minted}
+\usepackage{dirtree}
+\usepackage[T1]{fontenc} 
+\usepackage[latin1]{inputenc} 
+\usepackage[french]{babel} 
+\usepackage{a4wide} 
+\usepackage[dvips]{graphicx}
+\pagestyle{empty}
+\setlength{\parindent}{0cm}
+
+\begin{document}
+
+\begin{center}
+{\Large\bf
+\underline{Interprétation et Compilation}}~~~~\\~\\
+Compilateur C vers MIPS en Racket\\~\\
+Levacher Jimmy\\~\\
+31 décembre 2020
+\end{center}~
+
+\section{Analyse lexicale}
+L’analyse lexicale est la première étape de la lecture d’un code source.\\
+Son rôle, est de découper cette chaîne unités lexicales afin de vérifier chaque "mot" du langage.\\\\
+Ces mots sont déclarés dans le fichier {\tt lexer.rkt}.\\
+Nous retrouvons les mots clefs ({\tt if, else, while, ...}), les ponctuations ({\tt (), \{\}, ;, ...}), les contantes ({\tt Num, Str, Bool, Type}), les opérateurs ({\tt +, -, *, ...}), les identifiants ({\tt nom de variable, function, ...}) et les commentaires ({\tt //, /**/}).\\\\
+
+
+\begin{figure}[h]
+\begin{center}
+    \includegraphics[scale=0.8]{images2/1.png}
+\end{center}
+\caption{\label{fig:1}{\tt Tokens}}
+\end{figure}~\\
+
+
+\begin{minted}{JavaScript}
+//JL
+\end{minted}
+\pagestyle{plain}
+
+\begin{newpage}
+\section{Analyse syntaxique}
+L’analyse syntaxique est l’étape qui suit l’analyse lexicale et qui précède l’analyse sémantique.\\
+Le rôle de cette analyse est de comprendre et vérifier la structure du code source. Cette structure est définie par une grammaire non-contextuelle.
+\\
+Pour cela, l'outil {\tt parser} en racket sera utilisé dans le fichier {\tt parser.rkt}\\
+Ce dernier permet avec les tokens définis dans le lexer, de créer la grammaire et la structure du code.\\
+
+\begin{figure}[h]
+\begin{center}
+    \includegraphics[scale=0.8]{images2/2.png}
+\end{center}
+\caption{\label{fig:1}{\tt Tokens}}
+\end{figure}~\\
+
+Chaque ligne de notre code sera "comparée" à notre grammaire.\\
+Par exemple
+
+\begin{minted}{C}
+int a = 10;
+\end{minted}~\\
+D'après la grammaire, un programme peut-être une {\tt instr}, une {\tt instr} ça peut-être un {\tt type Lident Lassign sexpr Lsemicol}. Et dans notre exemple {\tt int} est un {\tt type}, {\tt a} est un {\tt Lident}, {\tt "="} correspond au token {\tt Lassign}, {\tt 10} est une simple expression {\tt sexpr} et {\tt ";"} correspond bien à notre token {\tt Lsemicol}.
+
+\pagestyle{plain}
+\end{newpage}
+
+\begin{newpage}
+\section{Analyse sémantique}
+Le rôle de l'analyse sémantique, est de comprendre et vérifier le sens du code source, qui est défini par la sémantique du langage.\\
+Le but de l’analyse sémantique est de produire un arbre de syntaxe abstraite (AST) sémantiquement valide.\\Cela signifie qu’on doit pouvoir interpréter ou compiler le code représenté par cet AST
+sans se soucier de ce qui a déjà été vérifié.\\
+Pour cela, il faut d'abord définir une table de hachage pour vérifier les fonctions (add, sub, div, ...) dans le fichier {\tt baselib.rkt}.\\Par exemple, {\tt add} prend une liste de {\tt num} et retourne un {\tt num} qui est le résultat de l'addition de la liste.\\
+
+\begin{figure}[h]
+\begin{center}
+    \includegraphics[scale=0.8]{images2/3.png}
+\end{center}
+\caption{\label{fig:1}{\tt Baselib}}
+\end{figure}~\\
+
+Une fois fait, le fichier {\tt analyzer.rkt} se chargera d'analyser les expressions et les instructions.
+
+\begin{figure}[h]
+\begin{center}
+    \includegraphics[scale=0.8]{images2/4.png}
+\end{center}
+\caption{\label{fig:1}{\tt Baselib}}
+\end{figure}~\\
+
+{\tt analyze-instr} va vérifier si la structure de l'instruction passée en argument {\tt match} avec une structure syntaxique.
+
+\pagestyle{plain}
+\end{newpage}
+
+\begin{newpage}
+\section{Compilation}
+Une fois l'analyse sémantique passée, il faut donc compiler le code à l'aide du fichier {\tt compiler.rkt} \\
+Le but de la compilation est de générer un fichier avec des insctructions MIPS en fonction de notre AST.\\
+Les instructions MIPS sont écrites dans le fichier {\tt mips.rkt}.
+
+\begin{figure}[h]
+\begin{center}
+    \includegraphics[scale=0.8]{images2/5.png}
+\end{center}
+\caption{\label{fig:1}{\tt Mips}}
+\end{figure}~\\
+
+C'est la fonction {\tt print-instr} qui se chargera d'écrire les instructions dans notre fichier compilé en fonction du hachage de notre {\tt baselib}.\\
+C'est cette dernière qui se charge d'appeler la fonction print-instr en fonction de l'instruction "matcher".
+
+\begin{figure}[h]
+\begin{center}
+    \includegraphics[scale=0.8]{images2/6.png}
+\end{center}
+\caption{\label{fig:1}{\tt Bselib}}
+\end{figure}~\\
+
+Par exemple, pour {\tt add}, les instructions {\tt Lw} et {\tt Add} sont "matchées" dans la fonction print-instr.
+
+\pagestyle{plain}
+\end{newpage}
+
+
+\bibliographystyle{alpha}
+\bibliography{locale}
+\end{document}

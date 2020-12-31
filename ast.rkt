@@ -9,8 +9,8 @@
 (struct Pvar (name pos)         #:transparent)
 (struct Pcall (func args pos)   #:transparent)
 (struct Passign (var expr pos)  #:transparent)
-(struct Pcond (val t f pos)     #:transparent)
-(struct Ploop (val args pos)    #:transparent)
+(struct Pcond (test t f pos)    #:transparent)
+(struct Pwhile (test args pos)  #:transparent)
 (struct Pblock (args pos)       #:transparent)
 
 ;; abstract syntax
@@ -21,8 +21,9 @@
 (struct Call (func args)        #:transparent)
 (struct Assign (var expr)       #:transparent)
 (struct Cond (test t f)         #:transparent)
-(struct Loop (test args)        #:transparent)
+(struct While (test args)       #:transparent)
 (struct Block (n)               #:transparent)
+(struct Func (id closure)       #:transparent)
 
 ;; inter lang
 (struct Data (lbl)              #:transparent)
@@ -39,6 +40,7 @@
 (struct Li      (dst imm)       #:transparent)
 (struct La      (dst loc)       #:transparent)
 (struct Add     (dst rg1 rg2)   #:transparent)
+(struct Pp      (dst)           #:transparent)
 (struct Addi    (dst reg imm)   #:transparent)
 (struct Sub     (dst rg1 rg2)   #:transparent)
 (struct Mul     (dst rg1 rg2)   #:transparent)
@@ -50,6 +52,12 @@
 (struct Sgt     (dst rg1 rg2)   #:transparent)
 (struct Sle     (dst rg1 rg2)   #:transparent)
 (struct Sge     (dst rg1 rg2)   #:transparent)
+(struct And     (dst rg1 rg2)   #:transparent)
+(struct Or      (dst rg1 rg2)   #:transparent)
+(struct Xor     (dst rg1 rg2)   #:transparent)
+(struct Sll     (dst rg1 rg2)   #:transparent)
+(struct Srl     (dst rg1 rg2)   #:transparent)
+(struct Not     (dst rg1)       #:transparent)
 (struct Sw      (reg loc)       #:transparent)
 (struct Lw      (reg loc)       #:transparent)
 (struct Jr      (reg)           #:transparent)

@@ -19,19 +19,16 @@
   (match e
     [(Pnum _ p) p]
     [(Pstr _ p) p]
+    [(Pbool _ p) p]
     [(Pvar _ p) p]
     [(Pcall _ _ p) p]
-    [(Pcond _ _ _ p) p]))
+    [(Pcond _ _ _ p) p]
+    [(Pwhile _ _ p) p]))
 
 (define (analyze-function f as pos env proc?)
   (unless (hash-has-key? env f)
     (err (format "unknown function '~a'" f) pos))
   (let ([ft (hash-ref env f)])
-    ;(if proc?
-    ;    (unless (eq? 'void (Fun_t-ret ft))
-    ;      (err (format "functions must return void if used as instruction: '~a'" f) pos))
-    ;    (when (eq? 'void (Fun_t-ret ft))
-    ;      (err (format "void is not a valid expression type: '~a'" f) pos)))
     (unless (= (length (Fun_t-args ft)) (length as))
       (err (format "arity mismatch (expected ~a, given ~a)"
                    (length (Fun_t-args ft))
@@ -55,6 +52,9 @@
     [(Pstr v pos)
      (cons (Str v)
            'str)]
+    [(Pbool v pos)
+     (cons (Bool v)
+           'bool)]
     [(Pvar n pos)
      (unless (hash-has-key? env n)
        (err (format "unbound variable: '~a'" n) pos))
@@ -89,15 +89,15 @@
      (cons (car (analyze-function f as pos env #t))
            env)]
     [(Pcond test true false pos)
-     (let ((t (analyze-instr test env))
-           (y (analyze-instr true env))
-           (n (analyze-instr false env)))
+     (let ((t (analyze-instr test env))   ;;test
+           (y (analyze-instr true env))   ;;true
+           (n (analyze-instr false env))) ;;false
      (cons (Cond (car t) (car y) (car n))
              env))]
-    [(Ploop test args pos)
+    [(Pwhile test args pos)
      (let ((t  (analyze-instr test env))
            (a  (analyze-instr args env)))
-       (cons (Loop (car t) (car a))
+       (cons (While (car t) (car a))
              env))]
     [(Pblock exprs pos)
      (cons (Block (car (analyze-instrs exprs env)))

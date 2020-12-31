@@ -20,14 +20,12 @@
      [(instr prog)                (cons $1 $2)])
     (instr
      [(type Lident Lassign sexpr Lsemicol) (Passign $2 $4 $1-start-pos)]
-     ;[(Lident Lopar args Lcpar)   (Pcall $1 $3 $1-start-pos)]
      [(expr)                      $1])
     (expr
-     ;[(instr)                     $1]
      [(cond)                      $1]
      [(loop)                      $1]
      [(funcall)                   $1]
-     [(sexpr Lpplus Lsemicol)     (Pcall '%add (list $1 (Pnum 1 $1-start-pos)) $1-start-pos)]
+     [(sexpr Lpplus Lsemicol)     (Pcall '%pp (list $1) $2-start-pos)]
      [(Locbra exprs Lccbra)       (Pblock $2 $1-start-pos)])
     (sexpr
      [(funcall)                   $1]
@@ -42,13 +40,14 @@
     (cond
      [(Lif Lopar sexpr Lcpar expr Lelse expr) (Pcond $3 $5 $7 $1-start-pos)])
     (loop
-     [(Lwhile Lopar sexpr Lcpar expr) (Ploop $3 $5 $1-start-pos)])
+     [(Lwhile Lopar sexpr Lcpar expr) (Pwhile $3 $5 $1-start-pos)]) ;;TODO for
     (constant
      [(Lnum)                      (Pnum $1 $1-start-pos)]
      [(Lstr)                      (Pstr $1 $1-start-pos)]
+     [(Lbool)                     (Pbool $1 $1-start-pos)]
      [(Lident)                    (Pvar $1 $1-start-pos)])
     (type
-     [(Ltype)      $1]) ;;Llist
+     [(Ltype)                     $1])
     (operator
      [(sexpr Lplus sexpr)         (Pcall '%add (list $1 $3) $2-start-pos)]
      [(sexpr Lsub sexpr)          (Pcall '%sub (list $1 $3) $2-start-pos)]
@@ -60,24 +59,34 @@
      [(sexpr Lpp sexpr)           (Pcall '%slt (list $1 $3) $2-start-pos)]
      [(sexpr Lpg sexpr)           (Pcall '%sgt (list $1 $3) $2-start-pos)]
      [(sexpr Lppe sexpr)          (Pcall '%sle (list $1 $3) $2-start-pos)]
-     [(sexpr Lpge sexpr)          (Pcall '%sge (list $1 $3) $2-start-pos)])
+     [(sexpr Lpge sexpr)          (Pcall '%sge (list $1 $3) $2-start-pos)]
+     [(sexpr Land sexpr)          (Pcall '%and (list $1 $3) $2-start-pos)]
+     [(sexpr Lor sexpr)           (Pcall '%or (list $1 $3) $2-start-pos)]
+     [(sexpr Lxor sexpr)          (Pcall '%xor (list $1 $3) $2-start-pos)]
+     [(sexpr Lsll sexpr)          (Pcall '%sll (list $1 $3) $2-start-pos)]
+     [(sexpr Lsrl sexpr)          (Pcall '%srl (list $1 $3) $2-start-pos)]
+     [(Lnot sexpr)                (Pcall '%not (list $2) $2-start-pos)])
     (args
      [()                          (list)]
      [(sexpr)                     (list $1)]
      ((sexpr Lcomma args)         (cons $1 $3))))
    (precs 
+    (left Lor)
+    (left Lxor)
+    (left Land)
+    (right Lnot)
+
+    (left Lsll)
+    (left Lsrl)
+
     (left Lequal)
     (left Lnequal)
     (left Lpp)
     (left Lpg)
     (left Lppe)
     (left Lpge)
-
-    (left Lmod)
-    (left Lplus)
-    (left Lsub)
-    (left Lmul)
-    (left Ldiv))
+    
+    (left Lmod Lsub Lplus Lmul Ldiv))
    (error
     (lambda (tok-ok? tok-name tok-value spos epos)
       (err (format "syntax error near ~a~a"

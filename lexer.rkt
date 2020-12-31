@@ -11,13 +11,15 @@
          keywords)
 
 (define-empty-tokens punctuations
-  (Lsemicol
+  (Lsemicol Lcol
   Lopar Lcpar Locbra Lccbra
-  Lcomma))
+  Lcomma Llist))
 
 (define-empty-tokens keywords
-  (Lif Lthen Lelse
+  (Lrec Lreturn
+  Lif Lthen Lelse
   Lwhile
+  Lempty
   Leof))
 
 (define-tokens constants
@@ -26,6 +28,8 @@
 (define-empty-tokens operators
   (Lplus Lpplus Lsub Lmul Ldiv Lmod
    Lequal Lnequal Lpp Lpg Lppe Lpge
+   Land Lor Lxor Lnot
+   Lsll Lsrl
    Lassign))
 
 (define-lex-abbrev identifier
@@ -49,6 +53,7 @@
    ["}"          (token-Lccbra)]
    [","          (token-Lcomma)]
    [";"          (token-Lsemicol)]
+   [":"          (token-Lcol)]
    ["="          (token-Lassign)]
    ["=="         (token-Lequal)]
    ["!="         (token-Lnequal)]
@@ -56,15 +61,22 @@
    [">"          (token-Lpg)]
    ["<="         (token-Lppe)]
    [">="         (token-Lpge)]
+   ["&&"         (token-Land)]
+   ["||"         (token-Lor)]
+   ["|"          (token-Lxor)]
+   ["!"          (token-Lnot)]
    ["+"          (token-Lplus)]
    ["++"         (token-Lpplus)]
    ["-"          (token-Lsub)]
    ["*"          (token-Lmul)]
    ["/"          (token-Ldiv)]
+   ["<<"         (token-Lsll)]
+   [">>"         (token-Lsrl)]
    ["%"          (token-Lmod)]
    ["if"         (token-Lif)]
    ["else"       (token-Lelse)]
    ["while"      (token-Lwhile)]
+   ["return"     (token-Lreturn)]
    [types        (token-Ltype (string->symbol lexeme))]
    [identifier   (token-Lident (string->symbol lexeme))]
    ["\""         (token-Lstr (string-lex input-port))]

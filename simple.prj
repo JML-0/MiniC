@@ -1,14 +1,116 @@
-// Commentaire sur 1 ligne
-/* Commentaire sur
-   plusieurs lignes
- */
+//commentaire 1 ligne
+/*
+  commentaire sur
+  plusieurs lignes
+*/
 
 int a = 10;
-int b = 10;
-while (a == 10)
-{
-  print_num(a);
-  print_nl();
+int b = (a * 10 % 1 * 5 / 2 + 10);
+int c = 0; // -> activer le while infini
+
+print_str("a = \t"); print_num(a); print_nl();
+print_str("b = \t"); print_num(b); print_nl();
+
+/* < */
+print_str("--- < ---\n    ");
+if (a < b){
+  print_num(1);
+} else{
+  print_num(0);
 }
-//print_bool((a + b) == 16); // pour afficher la valeur bool, mettre le résultat dans le registre $v0
-//print_nl();
+print_nl();
+
+/* > */
+print_str("--- > ---\n    ");
+if (a > b){
+  print_num(1);
+} else{
+  print_num(0);
+}
+print_nl();
+
+/* <= */
+print_str("--- <= ---\n    ");
+if (a <= b){
+  print_num(1);
+} else{
+  print_num(0);
+}
+print_nl();
+
+/* >= */
+print_str("--- >= ---\n    ");
+if (a >= b){
+  print_num(1);
+} else{
+  print_num(0);
+}
+print_nl();
+
+/* == */
+print_str("--- == ---\n    ");
+if (a == b){
+  print_num(1);
+} else{
+  print_num(0);
+}
+print_nl();
+
+/* != */
+print_str("--- != ---\n    ");
+if (a != b){
+  print_num(1);
+} else{
+  print_num(0);
+}
+print_nl();
+
+/* ! */
+print_str("--- !(==) ---\n    ");
+if (!(a == b)){
+  print_num(1);
+} else{
+  print_num(0);
+}
+print_nl();
+
+/* && */
+print_str("--- && ---\n    ");
+if (1 && 0){
+  print_num(1);
+} else{
+  print_num(0);
+}
+print_nl();
+
+/* || */
+print_str("--- || ---\n    ");
+if (1 || 0){
+  print_num(1);
+} else{
+  print_num(0);
+}
+print_nl();
+
+/* | */
+print_str("--- | ---\n    ");
+print_num(a | b);
+print_nl();
+
+/* << */
+print_str("--- << ---\n    ");
+print_num(a << 2);
+print_nl();
+
+/* >> */
+print_str("--- >> ---\n    ");
+print_num(a >> 2);
+print_nl();
+
+/* While */
+if (c == 1){
+  while(a >= b){
+    print_num(a << b);
+    print_nl();
+  }
+} else { print_nl(); }
